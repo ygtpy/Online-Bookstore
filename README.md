@@ -17,7 +17,7 @@ Modern ve kullanıcı dostu bir online kitap mağazası uygulaması. ASP.NET Cor
 ![Admin Panel](images/cart-checkout.png)
 
 ### 📱 Admin Dashboard
-![Mobile View](images/mobile-responsive.png)
+![Mobile View](images/admin-dashboard.png)
 
 > 📁 **Daha fazla görsel için:** [/images](images/) klasörünü inceleyebilirsiniz.
 
