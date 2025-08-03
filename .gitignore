@@ -1,0 +1,55 @@
+# Build sonuçları
+bin/
+obj/
+out/
+
+# Kullanıcı ayarları
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider, VS Code, Visual Studio
+.vscode/
+.idea/
+*.code-workspace
+
+# Dotnet publish / paketleme
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+
+# Temporary ASP.NET files
+*.dbmdl
+*.log
+*.pdb
+
+# Entity Framework Core Migrations (eğer kendi yedeğin yoksa)
+Migrations/
+
+# IIS
+.vs/
+*.iis*
+
+# wwwroot otomatik derlenen dosyalar
+wwwroot/lib/
+wwwroot/node_modules/
+
+# Node.js (varsa)
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# MacOS / Linux
+.DS_Store
+Thumbs.db
+
+# Kullanıcıya özel config dosyaları
+appsettings.Development.json
+secrets.json
+
+# Publish edilen dosyalar
+publish/

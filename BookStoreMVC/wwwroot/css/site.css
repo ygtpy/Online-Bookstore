@@ -1,0 +1,208 @@
+/* Custom Styles for Book Store */
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+}
+
+/* Card Hover Effects */
+.book-card, .category-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+    .book-card:hover, .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+    }
+
+/* Button Styles */
+.btn-primary {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #764ba2, #667eea);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+/* Navbar */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255,255,255,0.9);
+    transition: color 0.3s ease;
+}
+
+    .navbar-dark .navbar-nav .nav-link:hover {
+        color: #fff;
+    }
+
+/* Footer */
+.footer {
+    margin-top: 50px;
+    padding-top: 30px;
+}
+
+    .footer a {
+        color: #6c757d;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+        .footer a:hover {
+            color: #495057;
+        }
+
+/* Feature Icons */
+.feature-icon i {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Price Display */
+.text-primary {
+    color: #667eea !important;
+}
+
+/* Alert Animations */
+.alert {
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Cart Badge */
+.badge {
+    font-size: 0.7em;
+    min-width: 18px;
+    height: 18px;
+    line-height: 18px;
+    border-radius: 9px;
+}
+
+/* Form Styles */
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Card Image Overlay */
+.card-img-overlay {
+    background: rgba(0,0,0,0.4);
+    color: white;
+}
+
+/* Loading Spinner */
+.spinner-border {
+    color: #667eea;
+}
+
+/* Search and Filter Section */
+.filter-section {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 30px 0 !important;
+    }
+
+        .hero-section h1 {
+            font-size: 2rem !important;
+        }
+
+    .feature-icon i {
+        font-size: 2rem !important;
+    }
+}
+
+/* Admin Panel Styles */
+.admin-sidebar {
+    background: #343a40;
+    min-height: 100vh;
+}
+
+    .admin-sidebar .nav-link {
+        color: #fff;
+        padding: 15px 20px;
+        border-bottom: 1px solid #495057;
+    }
+
+        .admin-sidebar .nav-link:hover {
+            background: #495057;
+            color: #fff;
+        }
+
+        .admin-sidebar .nav-link.active {
+            background: #667eea;
+            color: #fff;
+        }
+
+.admin-content {
+    padding: 30px;
+}
+
+/* Table Styles */
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+    .table thead th {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+    }
+
+/* File Upload */
+.file-upload {
+    border: 2px dashed #667eea;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+    .file-upload:hover {
+        border-color: #764ba2;
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+/* Image Preview */
+.image-preview {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}

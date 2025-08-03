@@ -1,0 +1,226 @@
+﻿@model BookStoreMVC.Models.CategoryDto
+@{
+    ViewData["Title"] = "Yeni Kategori Ekle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus"></i> Yeni Kategori Ekle
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" asp-action="CreateCategory">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="Name" class="form-label">
+                                    <i class="fas fa-tag"></i> Kategori Adı *
+                                </label>
+                                <input type="text" class="form-control" id="Name" name="Name"
+                                       asp-for="Name" placeholder="Örn: Roman, Bilim Kurgu" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="imageFile" class="form-label">
+                                    <i class="fas fa-image"></i> Kategori Resmi
+                                </label>
+                                <input type="file" class="form-control" id="imageFile" name="imageFile"
+                                       accept="image/*" onchange="previewImage(event)">
+                                <small class="text-muted">JPG, PNG veya GIF formatında olmalıdır.</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Description" class="form-label">
+                                <i class="fas fa-align-left"></i> Açıklama
+                            </label>
+                            <textarea class="form-control" id="Description" name="Description"
+                                      asp-for="Description" rows="4"
+                                      placeholder="Kategori hakkında kısa bir açıklama yazınız..."></textarea>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div class="mb-3" id="imagePreview" style="display: none;">
+                            <label class="form-label">Resim Önizleme:</label>
+                            <div>
+                                <img id="preview" src="" alt="Önizleme" class="img-thumbnail"
+                                     style="max-width: 200px; max-height: 200px;">
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive"
+                                   asp-for="IsActive" checked>
+                            <label class="form-check-label" for="IsActive">
+                                <i class="fas fa-toggle-on text-success"></i> Kategori aktif olsun
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="@Url.Action("Categories")" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times"></i> İptal
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Kategori Ekle
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Card -->
+            <div class="card mt-4 bg-light">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="fas fa-lightbulb text-warning"></i> İpuçları</h6>
+                    <ul class="mb-0">
+                        <li><strong>Kategori Adı:</strong> Kısa ve açıklayıcı olmalı (örn: Roman, Bilim Kurgu, Tarih)</li>
+                        <li><strong>Açıklama:</strong> Kategorinin kapsamını net bir şekilde belirtmeli</li>
+                        <li><strong>Resim:</strong> Kategoriyi görsel olarak temsil eden bir resim seçin (opsiyonel)</li>
+                        <li><strong>Durum:</strong> Pasif kategoriler müşteriler tarafından görüntülenmez</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Existing Categories Preview -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-list"></i> Mevcut Kategoriler</h6>
+                </div>
+                <div class="card-body">
+                    <div id="existingCategories">
+                        <div class="text-center">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                            <small class="text-muted ms-2">Kategoriler yükleniyor...</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').style.display = 'none';
+            }
+        }
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const name = document.getElementById('Name').value.trim();
+
+            if (!name) {
+                e.preventDefault();
+                alert('Kategori adı zorunludur.');
+                return false;
+            }
+
+            if (name.length < 2) {
+                e.preventDefault();
+                alert('Kategori adı en az 2 karakter olmalıdır.');
+                return false;
+            }
+        });
+
+        // Load existing categories
+        async function loadExistingCategories() {
+            try {
+                const response = await fetch('https://localhost:7001/api/categories');
+                if (response.ok) {
+                    const categories = await response.json();
+                    displayCategories(categories);
+                } else {
+                    throw new Error('Kategoriler yüklenemedi');
+                }
+            } catch (error) {
+                document.getElementById('existingCategories').innerHTML =
+                    '<p class="text-muted text-center">Kategoriler yüklenirken hata oluştu.</p>';
+            }
+        }
+
+        function displayCategories(categories) {
+            const container = document.getElementById('existingCategories');
+
+            if (categories.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">Henüz kategori bulunmuyor.</p>';
+                return;
+            }
+
+            const categoriesHtml = categories.map(cat =>
+                `<span class="badge bg-primary me-2 mb-2 p-2">
+                    <i class="fas fa-folder"></i> ${cat.name}
+                    ${cat.isActive ? '' : '<small>(Pasif)</small>'}
+                </span>`
+            ).join('');
+
+            container.innerHTML = categoriesHtml;
+        }
+
+        // Real-time category name check
+        document.getElementById('Name').addEventListener('input', function() {
+            const name = this.value.trim();
+            if (name.length >= 2) {
+                // Check if category name already exists
+                fetch('https://localhost:7001/api/categories')
+                    .then(response => response.json())
+                    .then(categories => {
+                        const exists = categories.some(cat =>
+                            cat.name.toLowerCase() === name.toLowerCase()
+                        );
+
+                        if (exists) {
+                            this.setCustomValidity('Bu kategori adı zaten mevcut.');
+                            this.classList.add('is-invalid');
+                        } else {
+                            this.setCustomValidity('');
+                            this.classList.remove('is-invalid');
+                        }
+                    })
+                    .catch(() => {
+                        // Ignore errors for real-time validation
+                    });
+            }
+        });
+
+        // Load categories on page load
+        document.addEventListener('DOMContentLoaded', loadExistingCategories);
+
+        // Auto-fill suggestions
+        const suggestions = [
+            'Roman', 'Hikaye', 'Şiir', 'Deneme', 'Biyografi',
+            'Bilim Kurgu', 'Fantastik', 'Polisiye', 'Gerilim', 'Macera',
+            'Tarih', 'Felsefe', 'Psikoloji', 'Sosyoloji', 'Sanat',
+            'Bilim', 'Teknoloji', 'Sağlık', 'Spor', 'Yemek',
+            'Çocuk Kitapları', 'Gençlik Romanları', 'Akademik', 'Dil Öğrenimi'
+        ];
+
+        // Add datalist for suggestions
+        const nameInput = document.getElementById('Name');
+        const datalist = document.createElement('datalist');
+        datalist.id = 'categorysuggestions';
+
+        suggestions.forEach(suggestion => {
+            const option = document.createElement('option');
+            option.value = suggestion;
+            datalist.appendChild(option);
+        });
+
+        nameInput.setAttribute('list', 'categorysuggestions');
+        nameInput.parentNode.appendChild(datalist);
+    </script>
+}

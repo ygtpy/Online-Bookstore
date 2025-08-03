@@ -1,0 +1,256 @@
+﻿@{
+    ViewData["Title"] = "Admin Paneli";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var recentBooks = ViewBag.RecentBooks as List<BookStoreMVC.Models.BookDto>;
+}
+
+<div class="container-fluid">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="card-title mb-1">Hoş Geldiniz, Admin!</h2>
+                            <p class="card-text">Kitap mağazası yönetim paneli</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-tachometer-alt fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Toplam Kitap
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @ViewBag.TotalBooks
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Toplam Kategori
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @ViewBag.TotalCategories
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-folder fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Aktif Kitaplar
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @(recentBooks?.Count(b => b.IsActive) ?? 0)
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Stokta Olan
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                @(recentBooks?.Count(b => b.Stock > 0) ?? 0)
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-warehouse fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Books and Quick Actions -->
+    <div class="row">
+        <!-- Recent Books -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Son Eklenen Kitaplar</h6>
+                    <a href="@Url.Action("Books")" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye"></i> Tümünü Görüntüle
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if (recentBooks != null && recentBooks.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Resim</th>
+                                        <th>Başlık</th>
+                                        <th>Yazar</th>
+                                        <th>Fiyat</th>
+                                        <th>Stok</th>
+                                        <th>Durum</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var book in recentBooks)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(book.ImageUrl))
+                                                {
+                                                    <img src="@book.ImageUrl" class="img-thumbnail" alt="@book.Title" style="width: 50px; height: 50px; object-fit: cover;">
+                                                }
+                                                else
+                                                {
+                                                    <div class="bg-light d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                        <i class="fas fa-book text-muted"></i>
+                                                    </div>
+                                                }
+                                            </td>
+                                            <td>@book.Title</td>
+                                            <td>@book.Author</td>
+                                            <td>@book.Price.ToString("C2")</td>
+                                            <td>
+                                                @if (book.Stock > 0)
+                                                {
+                                                    <span class="badge bg-success">@book.Stock</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Stokta Yok</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (book.IsActive)
+                                                {
+                                                    <span class="badge bg-success">Aktif</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">Pasif</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-3">
+                            <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Henüz kitap eklenmemiş.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Hızlı İşlemler</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="@Url.Action("CreateBook")" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Yeni Kitap Ekle
+                        </a>
+                        <a href="@Url.Action("CreateCategory")" class="btn btn-success">
+                            <i class="fas fa-folder-plus"></i> Yeni Kategori Ekle
+                        </a>
+                        <a href="@Url.Action("Books")" class="btn btn-info">
+                            <i class="fas fa-book"></i> Kitapları Yönet
+                        </a>
+                        <a href="@Url.Action("Categories")" class="btn btn-warning">
+                            <i class="fas fa-folder"></i> Kategorileri Yönet
+                        </a>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="font-weight-bold text-secondary">Sistem Bilgileri</h6>
+                    <ul class="list-unstyled">
+                        <li><small class="text-muted">Sunucu Zamanı: @DateTime.Now.ToString("dd.MM.yyyy HH:mm")</small></li>
+                        <li><small class="text-muted">Sistem Durumu: <span class="text-success">Çevrimiçi</span></small></li>
+                        <li><small class="text-muted">Veritabanı: <span class="text-success">Bağlı</span></small></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+
+    .border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+
+    .border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+
+    .text-xs {
+        font-size: 0.7rem;
+    }
+
+    .text-gray-300 {
+        color: #dddfeb !important;
+    }
+
+    .text-gray-800 {
+        color: #5a5c69 !important;
+    }
+</style>

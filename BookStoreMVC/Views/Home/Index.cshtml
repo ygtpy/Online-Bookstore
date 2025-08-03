@@ -1,0 +1,193 @@
+﻿@{
+    ViewData["Title"] = "Anasayfa";
+    var featuredBooks = ViewBag.FeaturedBooks as List<BookStoreMVC.Models.BookDto>;
+    var categories = ViewBag.Categories as List<BookStoreMVC.Models.CategoryDto>;
+}
+
+<!-- Hero Section -->
+<div class="hero-section bg-primary text-white py-5 mb-5 rounded">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold">Kitap Mağazasına Hoş Geldiniz</h1>
+        <p class="lead">En kaliteli kitapları en uygun fiyatlarla keşfedin</p>
+        <a class="btn btn-light btn-lg" asp-controller="Books" asp-action="Index">
+            <i class="fas fa-book"></i> Kitapları Keşfet
+        </a>
+    </div>
+</div>
+
+<!-- Featured Categories -->
+@if (categories != null && categories.Any())
+{
+    <section class="mb-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Popüler Kategoriler</h2>
+            <div class="row">
+                @foreach (var category in categories)
+                {
+                    <div class="col-md-3 col-sm-6 mb-4">
+                        <div class="card h-100 category-card">
+                            @if (!string.IsNullOrEmpty(category.ImageUrl))
+                            {
+                                <img src="@category.ImageUrl" class="card-img-top" alt="@category.Name" style="height: 200px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-folder-open fa-3x text-muted"></i>
+                                </div>
+                            }
+                            <div class="card-body text-center">
+                                <h5 class="card-title">@category.Name</h5>
+                                <p class="card-text">@category.Description</p>
+                                <a href="@Url.Action("Details", "Categories", new { id = category.Id })" class="btn btn-outline-primary">
+                                    <i class="fas fa-eye"></i> Görüntüle
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- Featured Books -->
+@if (featuredBooks != null && featuredBooks.Any())
+{
+    <section class="mb-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Öne Çıkan Kitaplar</h2>
+            <div class="row">
+                @foreach (var book in featuredBooks)
+                {
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100 book-card">
+                            @if (!string.IsNullOrEmpty(book.ImageUrl))
+                            {
+                                <img src="@book.ImageUrl" class="card-img-top" alt="@book.Title" style="height: 300px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+                                    <i class="fas fa-book fa-3x text-muted"></i>
+                                </div>
+                            }
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">@book.Title</h5>
+                                <p class="card-text text-muted">@book.Author</p>
+                                @if (!string.IsNullOrEmpty(book.Description) && book.Description.Length > 100)
+                                {
+                                    <p class="card-text">@book.Description.Substring(0, 100)...</p>
+                                }
+                                else
+                                {
+                                    <p class="card-text">@book.Description</p>
+                                }
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="h5 text-primary mb-0">@book.Price.ToString("C2")</span>
+                                        @if (book.Stock > 0)
+                                        {
+                                            <span class="badge bg-success">Stokta Var</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Stokta Yok</span>
+                                        }
+                                    </div>
+                                    <div class="btn-group w-100" role="group">
+                                        <a href="@Url.Action("Details", "Books", new { id = book.Id })" class="btn btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Detay
+                                        </a>
+                                        @if (book.Stock > 0)
+                                        {
+                                            <button type="button" class="btn btn-primary" onclick="addToCart(@book.Id)">
+                                                <i class="fas fa-cart-plus"></i> Sepete Ekle
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="text-center">
+                <a class="btn btn-primary btn-lg" asp-controller="Books" asp-action="Index">
+                    <i class="fas fa-book-open"></i> Tüm Kitapları Görüntüle
+                </a>
+            </div>
+        </div>
+    </section>
+}
+
+<!-- Features Section -->
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Neden Bizi Seçmelisiniz?</h2>
+        <div class="row">
+            <div class="col-md-4 text-center mb-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-shipping-fast fa-3x text-primary"></i>
+                </div>
+                <h4>Hızlı Teslimat</h4>
+                <p>Siparişlerinizi en kısa sürede kapınıza getiriyoruz.</p>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-shield-alt fa-3x text-primary"></i>
+                </div>
+                <h4>Güvenli Alışveriş</h4>
+                <p>SSL sertifikası ile güvenli ödeme seçenekleri.</p>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-headset fa-3x text-primary"></i>
+                </div>
+                <h4>7/24 Destek</h4>
+                <p>Müşteri hizmetlerimiz her zaman yanınızda.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        function addToCart(bookId) {
+            $.ajax({
+                url: '@Url.Action("AddToCart", "Books")',
+                type: 'POST',
+                data: { bookId: bookId, quantity: 1 },
+                success: function(response) {
+                    if (response.success) {
+                        // Update cart count
+                        $('#cart-count').text(response.cartCount);
+
+                        // Show success message
+                        showAlert('success', response.message);
+                    } else {
+                        showAlert('danger', response.message);
+                    }
+                },
+                error: function() {
+                    showAlert('danger', 'Bir hata oluştu. Lütfen tekrar deneyin.');
+                }
+            });
+        }
+
+        function showAlert(type, message) {
+            var alertHtml = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+                           message +
+                           '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                           '</div>';
+
+            // Add alert to top of main content
+            $('main').prepend(alertHtml);
+
+            // Auto dismiss after 3 seconds
+            setTimeout(function() {
+                $('.alert').alert('close');
+            }, 3000);
+        }
+    </script>
+}

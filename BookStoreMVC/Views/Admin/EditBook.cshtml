@@ -1,0 +1,258 @@
+﻿@model BookStoreMVC.Models.BookDto
+@{
+    ViewData["Title"] = "Kitap Düzenle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var categories = ViewBag.Categories as List<BookStoreMVC.Models.CategoryDto>;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="fas fa-edit"></i> Kitap Düzenle: @Model.Title
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" asp-action="EditBook" asp-route-id="@Model.Id">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="CreatedDate" />
+                        <input type="hidden" asp-for="ImageUrl" id="currentImageUrl" />
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="Title" class="form-label">
+                                    <i class="fas fa-book"></i> Kitap Adı *
+                                </label>
+                                <input type="text" class="form-control" id="Title" name="Title" 
+                                       asp-for="Title" placeholder="Örn: 1984" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="Author" class="form-label">
+                                    <i class="fas fa-user"></i> Yazar *
+                                </label>
+                                <input type="text" class="form-control" id="Author" name="Author" 
+                                       asp-for="Author" placeholder="Örn: George Orwell" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="CategoryId" class="form-label">
+                                    <i class="fas fa-folder"></i> Kategori *
+                                </label>
+                                <select class="form-select" id="CategoryId" name="CategoryId"
+                                        asp-for="CategoryId" required>
+                                    <option value="">Kategori seçiniz...</option>
+                                    @if (categories != null)
+                                    {
+                                        @foreach (var category in categories)
+                                        {
+                                            <option value="@category.Id" selected="@(Model.CategoryId == category.Id)">
+                                                @category.Name
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="Price" class="form-label">
+                                    <i class="fas fa-tag"></i> Fiyat (₺) *
+                                </label>
+                                <input type="number" class="form-control" id="Price" name="Price" 
+                                       asp-for="Price" step="0.01" min="0" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="Stock" class="form-label">
+                                    <i class="fas fa-warehouse"></i> Stok Adedi
+                                </label>
+                                <input type="number" class="form-control" id="Stock" name="Stock" 
+                                       asp-for="Stock" min="0">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="imageFile" class="form-label">
+                                    <i class="fas fa-image"></i> Kitap Resmi
+                                </label>
+                                <input type="file" class="form-control" id="imageFile" name="imageFile" 
+                                       accept="image/*" onchange="previewImage(event)">
+                                <small class="text-muted">JPG, PNG veya GIF formatında olmalıdır. Boş bırakılırsa mevcut resim korunur.</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive" 
+                                           asp-for="IsActive">
+                                    <label class="form-check-label" for="IsActive">
+                                        <i class="fas fa-toggle-on text-success"></i> Kitap aktif olsun
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="Description" class="form-label">
+                                <i class="fas fa-align-left"></i> Açıklama
+                            </label>
+                            <textarea class="form-control" id="Description" name="Description" 
+                                      asp-for="Description" rows="4" 
+                                      placeholder="Kitap hakkında kısa bir açıklama yazınız..."></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <!-- Current Image -->
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Mevcut Resim:</label>
+                                    <div>
+                                        <img src="@Model.ImageUrl" alt="@Model.Title" class="img-thumbnail" 
+                                             style="max-width: 200px; max-height: 250px; object-fit: cover;">
+                                    </div>
+                                </div>
+                            }
+                            
+                            <!-- Image Preview -->
+                            <div class="col-md-6 mb-3" id="imagePreview" style="display: none;">
+                                <label class="form-label">Yeni Resim Önizleme:</label>
+                                <div>
+                                    <img id="preview" src="" alt="Önizleme" class="img-thumbnail" 
+                                         style="max-width: 200px; max-height: 250px; object-fit: cover;">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                            <div>
+                                <a href="@Url.Action("Details", "Books", new { id = Model.Id })" 
+                                   class="btn btn-outline-info" target="_blank">
+                                    <i class="fas fa-eye"></i> Kitabı Görüntüle
+                                </a>
+                            </div>
+                            <div>
+                                <a href="@Url.Action("Books")" class="btn btn-secondary me-md-2">
+                                    <i class="fas fa-times"></i> İptal
+                                </a>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-save"></i> Güncelle
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Book Info Card -->
+            <div class="card mt-4 bg-light">
+                <div class="card-body">
+                    <h6 class="card-title">Kitap Bilgileri</h6>
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <small class="text-muted">Oluşturulma:</small><br>
+                            <span>@Model.CreatedDate.ToString("dd.MM.yyyy")</span>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted">Kategori:</small><br>
+                            <span>@(Model.Category?.Name ?? "Bilinmiyor")</span>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted">Durum:</small><br>
+                            <span class="badge @(Model.IsActive ? "bg-success" : "bg-secondary")">
+                                @(Model.IsActive ? "Aktif" : "Pasif")
+                            </span>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted">Stok Durumu:</small><br>
+                            <span class="badge @(Model.Stock > 0 ? "bg-success" : "bg-danger")">
+                                @(Model.Stock > 0 ? $"{Model.Stock} adet" : "Stokta Yok")
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').style.display = 'none';
+            }
+        }
+        
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const title = document.getElementById('Title').value.trim();
+            const author = document.getElementById('Author').value.trim();
+            const price = document.getElementById('Price').value;
+            const categoryId = document.getElementById('CategoryId').value;
+            
+            if (!title || !author || !price || !categoryId) {
+                e.preventDefault();
+                alert('Lütfen tüm zorunlu alanları doldurun.');
+                return false;
+            }
+            
+            if (parseFloat(price) <= 0) {
+                e.preventDefault();
+                alert('Fiyat 0\'dan büyük olmalıdır.');
+                return false;
+            }
+        });
+        
+        // Auto-save draft (optional feature)
+        let autoSaveTimer;
+        function autoSave() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                const formData = {
+                    title: document.getElementById('Title').value,
+                    author: document.getElementById('Author').value,
+                    description: document.getElementById('Description').value,
+                    price: document.getElementById('Price').value,
+                    stock: document.getElementById('Stock').value
+                };
+                
+                localStorage.setItem('bookEditDraft_@Model.Id', JSON.stringify(formData));
+                console.log('Draft saved...');
+            }, 2000);
+        }
+        
+        // Add auto-save to form inputs
+        document.querySelectorAll('input, textarea, select').forEach(input => {
+            input.addEventListener('input', autoSave);
+        });
+        
+        // Load draft on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const draft = localStorage.getItem('bookEditDraft_@Model.Id');
+            if (draft && confirm('Kaydedilmemiş değişiklikler bulundu. Yüklemek ister misiniz?')) {
+                const data = JSON.parse(draft);
+                Object.keys(data).forEach(key => {
+                    const element = document.getElementById(key.charAt(0).toUpperCase() + key.slice(1));
+                    if (element && data[key]) {
+                        element.value = data[key];
+                    }
+                });
+            }
+        });
+        
+        // Clear draft on successful submit
+        document.querySelector('form').addEventListener('submit', function() {
+            localStorage.removeItem('bookEditDraft_@Model.Id');
+        });
+    </script>
+}

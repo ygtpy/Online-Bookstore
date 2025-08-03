@@ -1,0 +1,366 @@
+﻿@model BookStoreMVC.Models.Cart
+@{
+    ViewData["Title"] = "Sipariş Tamamla";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-credit-card"></i> @ViewData["Title"]</h2>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Order Form -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user"></i> Müşteri Bilgileri</h4>
+                </div>
+                <div class="card-body">
+                    <form id="checkoutForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="customerName" class="form-label">Ad Soyad *</label>
+                                <input type="text" class="form-control" id="customerName" name="customerName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="customerEmail" class="form-label">E-posta *</label>
+                                <input type="email" class="form-control" id="customerEmail" name="customerEmail" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="customerPhone" class="form-label">Telefon</label>
+                                <input type="tel" class="form-control" id="customerPhone" name="customerPhone">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="customerCity" class="form-label">Şehir *</label>
+                                <select class="form-select" id="customerCity" name="customerCity" required>
+                                    <option value="">Şehir seçiniz...</option>
+                                    <option value="Istanbul">İstanbul</option>
+                                    <option value="Ankara">Ankara</option>
+                                    <option value="Izmir">İzmir</option>
+                                    <option value="Bursa">Bursa</option>
+                                    <option value="Antalya">Antalya</option>
+                                    <option value="Other">Diğer</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="shippingAddress" class="form-label">Teslimat Adresi *</label>
+                            <textarea class="form-control" id="shippingAddress" name="shippingAddress"
+                                      rows="3" placeholder="Tam adresinizi yazınız..." required></textarea>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="card mt-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-credit-card"></i> Ödeme Yöntemi</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="paymentMethod"
+                                                   id="creditCard" value="creditCard" checked>
+                                            <label class="form-check-label" for="creditCard">
+                                                <i class="fas fa-credit-card"></i> Kredi Kartı
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="paymentMethod"
+                                                   id="bankTransfer" value="bankTransfer">
+                                            <label class="form-check-label" for="bankTransfer">
+                                                <i class="fas fa-university"></i> Banka Havalesi
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Credit Card Form -->
+                                <div id="creditCardForm" class="mt-3">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="cardNumber" class="form-label">Kart Numarası</label>
+                                            <input type="text" class="form-control" id="cardNumber"
+                                                   placeholder="1234 5678 9012 3456" maxlength="19">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="cardName" class="form-label">Kart Üzerindeki İsim</label>
+                                            <input type="text" class="form-control" id="cardName">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="expiryMonth" class="form-label">Ay</label>
+                                            <select class="form-select" id="expiryMonth">
+                                                <option value="">Ay</option>
+                                                @for (int i = 1; i <= 12; i++)
+                                                {
+                                                    <option value="@i.ToString("00")">@i.ToString("00")</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="expiryYear" class="form-label">Yıl</label>
+                                            <select class="form-select" id="expiryYear">
+                                                <option value="">Yıl</option>
+                                                @for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 10; i++)
+                                                {
+                                                    <option value="@i">@i</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="cvv" class="form-label">CVV</label>
+                                            <input type="text" class="form-control" id="cvv" placeholder="123" maxlength="4">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Bank Transfer Info -->
+                                <div id="bankTransferInfo" class="mt-3" style="display: none;">
+                                    <div class="alert alert-info">
+                                        <h6><i class="fas fa-info-circle"></i> Havale Bilgileri</h6>
+                                        <p class="mb-1"><strong>Banka:</strong> Örnek Bankası</p>
+                                        <p class="mb-1"><strong>Hesap No:</strong> 1234567890</p>
+                                        <p class="mb-1"><strong>IBAN:</strong> TR12 3456 7890 1234 5678 9012 34</p>
+                                        <p class="mb-0"><small>Havale açıklamasına sipariş numaranızı yazınız.</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terms and Conditions -->
+                        <div class="mt-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="termsAccepted" required>
+                                <label class="form-check-label" for="termsAccepted">
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">
+                                        Kullanım şartlarını
+                                    </a> ve
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">
+                                        gizlilik politikasını
+                                    </a> okudum, kabul ediyorum. *
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Sipariş Özeti</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Cart Items -->
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">@item.Title</h6>
+                                <small class="text-muted">@item.Author</small>
+                                <div class="text-muted small">@item.Quantity x @item.Price.ToString("C2")</div>
+                            </div>
+                            <div class="text-end">
+                                <strong>@item.TotalPrice.ToString("C2")</strong>
+                            </div>
+                        </div>
+                    }
+
+                    <hr>
+
+                    <!-- Totals -->
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Ara Toplam:</span>
+                        <span>@ViewBag.CartTotal.ToString("C2")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Kargo:</span>
+                        <span class="text-success">Ücretsiz</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>KDV (%18):</span>
+                        <span>@((ViewBag.CartTotal * 0.18m).ToString("C2"))</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Toplam:</strong>
+                        <strong class="text-primary">@((ViewBag.CartTotal * 1.18m).ToString("C2"))</strong>
+                    </div>
+
+                    <!-- Order Button -->
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-success btn-lg" onclick="completeOrder()">
+                            <i class="fas fa-check"></i> Siparişi Tamamla
+                        </button>
+                    </div>
+
+                    <!-- Security -->
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt"></i> Güvenli ödeme garantisi
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kullanım Şartları</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bu kullanım şartları örnek metindir. Gerçek bir uygulamada yasal metinler yer almalıdır.</p>
+                <p>Müşteri hakları, iade koşulları, teslimat şartları vb. bilgiler burada yer alır.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gizlilik Politikası</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bu gizlilik politikası örnek metindir. KVKK uyumlu gerçek metinler yer almalıdır.</p>
+                <p>Kişisel verilerin işlenmesi, saklanması ve korunması ile ilgili bilgiler burada yer alır.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Payment method toggle
+            $('input[name="paymentMethod"]').change(function() {
+                if ($(this).val() === 'creditCard') {
+                    $('#creditCardForm').show();
+                    $('#bankTransferInfo').hide();
+                } else {
+                    $('#creditCardForm').hide();
+                    $('#bankTransferInfo').show();
+                }
+            });
+
+            // Card number formatting
+            $('#cardNumber').on('input', function() {
+                var value = $(this).val().replace(/\s/g, '').replace(/[^0-9]/gi, '');
+                var formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                $(this).val(formattedValue);
+            });
+
+            // CVV validation
+            $('#cvv').on('input', function() {
+                var value = $(this).val().replace(/[^0-9]/gi, '');
+                $(this).val(value);
+            });
+        });
+
+        function completeOrder() {
+            // Form validation
+            var form = document.getElementById('checkoutForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Get form data
+            var customerName = $('#customerName').val();
+            var customerEmail = $('#customerEmail').val();
+            var shippingAddress = $('#shippingAddress').val();
+            var termsAccepted = $('#termsAccepted').is(':checked');
+
+            if (!termsAccepted) {
+                alert('Lütfen kullanım şartlarını kabul ediniz.');
+                return;
+            }
+
+            // Show loading
+            $('button[onclick="completeOrder()"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> İşleniyor...');
+
+            // Submit order
+            $.ajax({
+                url: '@Url.Action("CompleteOrder", "Books")',
+                type: 'POST',
+                data: {
+                    customerName: customerName,
+                    customerEmail: customerEmail,
+                    shippingAddress: shippingAddress
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Show success message
+                        showOrderSuccess();
+
+                        // Update cart count
+                        $('#cart-count').text('0');
+
+                        // Redirect after 3 seconds
+                        setTimeout(function() {
+                            window.location.href = '@Url.Action("Index", "Home")';
+                        }, 3000);
+                    } else {
+                        showAlert('danger', response.message);
+                        $('button[onclick="completeOrder()"]').prop('disabled', false).html('<i class="fas fa-check"></i> Siparişi Tamamla');
+                    }
+                },
+                error: function() {
+                    showAlert('danger', 'Bir hata oluştu. Lütfen tekrar deneyin.');
+                    $('button[onclick="completeOrder()"]').prop('disabled', false).html('<i class="fas fa-check"></i> Siparişi Tamamla');
+                }
+            });
+        }
+
+        function showOrderSuccess() {
+            var successHtml = '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                             '<h4 class="alert-heading"><i class="fas fa-check-circle"></i> Sipariş Başarılı!</h4>' +
+                             '<p>Siparişiniz başarıyla oluşturuldu. Kısa süre içinde e-posta ile bilgilendirme yapılacaktır.</p>' +
+                             '<hr>' +
+                             '<p class="mb-0">Ana sayfaya yönlendiriliyorsunuz...</p>' +
+                             '</div>';
+
+            $('main').prepend(successHtml);
+            $('html, body').animate({ scrollTop: 0 }, 500);
+        }
+
+        function showAlert(type, message) {
+            var alertHtml = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+                           message +
+                           '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                           '</div>';
+
+            $('main').prepend(alertHtml);
+            $('html, body').animate({ scrollTop: 0 }, 500);
+
+            setTimeout(function() {
+                $('.alert').alert('close');
+            }, 5000);
+        }
+    </script>
+}

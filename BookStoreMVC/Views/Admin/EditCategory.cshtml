@@ -1,0 +1,120 @@
+﻿@model BookStoreMVC.Models.CategoryDto
+@{
+    ViewData["Title"] = "Kategori Düzenle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="fas fa-edit"></i> Kategori Düzenle: @Model.Name
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" asp-action="EditCategory" asp-route-id="@Model.Id">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="CreatedDate" />
+                        <input type="hidden" asp-for="ImageUrl" id="currentImageUrl" />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="Name" class="form-label">
+                                    <i class="fas fa-tag"></i> Kategori Adı *
+                                </label>
+                                <input type="text" class="form-control" id="Name" name="Name"
+                                       asp-for="Name" placeholder="Örn: Roman" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="imageFile" class="form-label">
+                                    <i class="fas fa-image"></i> Kategori Resmi
+                                </label>
+                                <input type="file" class="form-control" id="imageFile" name="imageFile"
+                                       accept="image/*" onchange="previewImage(event)">
+                                <small class="text-muted">JPG, PNG veya GIF formatında olmalıdır. Boş bırakılırsa mevcut resim korunur.</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Description" class="form-label">
+                                <i class="fas fa-align-left"></i> Açıklama
+                            </label>
+                            <textarea class="form-control" id="Description" name="Description"
+                                      asp-for="Description" rows="3"
+                                      placeholder="Kategori hakkında kısa bir açıklama yazınız..."></textarea>
+                        </div>
+
+                        <!-- Current Image -->
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Mevcut Resim:</label>
+                                <div>
+                                    <img src="@Model.ImageUrl" alt="@Model.Name" class="img-thumbnail"
+                                         style="max-width: 200px; max-height: 200px;">
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Image Preview -->
+                        <div class="mb-3" id="imagePreview" style="display: none;">
+                            <label class="form-label">Yeni Resim Önizleme:</label>
+                            <div>
+                                <img id="preview" src="" alt="Önizleme" class="img-thumbnail"
+                                     style="max-width: 200px; max-height: 200px;">
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive"
+                                   asp-for="IsActive">
+                            <label class="form-check-label" for="IsActive">
+                                <i class="fas fa-toggle-on text-success"></i> Kategori aktif olsun
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="@Url.Action("Categories")" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times"></i> İptal
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Güncelle
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').style.display = 'none';
+            }
+        }
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const name = document.getElementById('Name').value.trim();
+
+            if (!name) {
+                e.preventDefault();
+                alert('Kategori adı zorunludur.');
+                return false;
+            }
+        });
+    </script>
+}

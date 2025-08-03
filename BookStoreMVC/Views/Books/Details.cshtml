@@ -1,0 +1,321 @@
+﻿@model BookStoreMVC.Models.BookDto
+@{
+    ViewData["Title"] = Model.Title;
+    var relatedBooks = ViewBag.RelatedBooks as List<BookStoreMVC.Models.BookDto>;
+}
+
+<div class="container">
+    <!-- Breadcrumb -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Anasayfa</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Books" asp-action="Index">Kitaplar</a></li>
+                    @if (Model.Category != null)
+                    {
+                            <li class="breadcrumb-item">
+                                <a asp-controller="Categories" asp-action="Details" asp-route-id="@Model.CategoryId">
+                                @Model.Category.Name
+                                </a>
+                            </li>
+                    }
+                    <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Book Details -->
+    <div class="row mb-5">
+        <div class="col-md-5">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                    <img src="@Model.ImageUrl" class="img-fluid rounded shadow" alt="@Model.Title">
+            }
+            else
+            {
+                    <div class="bg-light rounded shadow d-flex align-items-center justify-content-center" 
+                         style="height: 500px;">
+                        <i class="fas fa-book fa-5x text-muted"></i>
+                    </div>
+            }
+        </div>
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h1 class="card-title display-6 text-primary">@Model.Title</h1>
+                    <p class="lead text-muted mb-3">
+                        <i class="fas fa-user"></i> @Model.Author
+                    </p>
+
+                    @if (Model.Category != null)
+                    {
+                            <p class="mb-3">
+                                <span class="badge bg-secondary fs-6">
+                                    <i class="fas fa-tag"></i> @Model.Category.Name
+                                </span>
+                            </p>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                            <div class="mb-4">
+                                <h5>Açıklama</h5>
+                                <p class="text-muted">@Model.Description</p>
+                            </div>
+                    }
+
+                    @if (TempData["BookDetails"] != null)
+                    {
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> @TempData["BookDetails"]
+                            </div>
+                    }
+
+                    <!-- Price and Stock -->
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                <h3 class="text-primary">@Model.Price.ToString("C2")</h3>
+                                <p class="text-muted mb-0">Fiyat</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                @if (Model.Stock > 0)
+                                {
+                                        <h3 class="text-success">@Model.Stock</h3>
+                                        <p class="text-muted mb-0">Stokta</p>
+                                }
+                                else
+                                {
+                                        <h3 class="text-danger">0</h3>
+                                        <p class="text-muted mb-0">Stokta Yok</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quantity Selection -->
+                    @if (Model.Stock > 0)
+                    {
+                            <div class="mb-4">
+                                <label for="quantity" class="form-label">Adet:</label>
+                                <div class="input-group" style="max-width: 150px;">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="decreaseQuantity()">-</button>
+                                    <input type="number" class="form-control text-center" id="quantity" value="1" min="1" max="@Model.Stock">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="increaseQuantity()">+</button>
+                                </div>
+                            </div>
+                    }
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        @if (Model.Stock > 0)
+                        {
+                                <button type="button" class="btn btn-primary btn-lg me-md-2" onclick="addToCartWithQuantity()">
+                                    <i class="fas fa-cart-plus"></i> Sepete Ekle
+                                </button>
+                        }
+                        else
+                        {
+                                <button type="button" class="btn btn-secondary btn-lg me-md-2" disabled>
+                                    <i class="fas fa-times"></i> Stokta Yok
+                                </button>
+                        }
+
+                        <button type="button" class="btn btn-outline-danger btn-lg me-md-2" onclick="addToFavorites(@Model.Id)">
+                            <i class="fas fa-heart"></i> Favorilere Ekle
+                        </button>
+
+                        <button type="button" class="btn btn-outline-info btn-lg" onclick="shareBook()">
+                            <i class="fas fa-share-alt"></i> Paylaş
+                        </button>
+                    </div>
+
+                    <!-- Additional Info -->
+                    <div class="mt-4 pt-4 border-top">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <i class="fas fa-shipping-fast fa-2x text-primary mb-2"></i>
+                                <p class="small text-muted">Ücretsiz Kargo</p>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-undo fa-2x text-success mb-2"></i>
+                                <p class="small text-muted">Kolay İade</p>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-shield-alt fa-2x text-info mb-2"></i>
+                                <p class="small text-muted">Güvenli Ödeme</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Books -->
+    @if (relatedBooks != null && relatedBooks.Any())
+    {
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="mb-4">İlgili Kitaplar</h3>
+                </div>
+            </div>
+
+            <div class="row">
+            @foreach (var book in relatedBooks)
+            {
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card h-100 book-card">
+                        @if (!string.IsNullOrEmpty(book.ImageUrl))
+                        {
+                                        <img src="@book.ImageUrl" class="card-img-top" alt="@book.Title" 
+                                             style="height: 200px; object-fit: cover;">
+                        }
+                        else
+                        {
+                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                             style="height: 200px;">
+                                            <i class="fas fa-book fa-2x text-muted"></i>
+                                        </div>
+                        }
+
+                                <div class="card-body d-flex flex-column">
+                                    <h6 class="card-title">@book.Title</h6>
+                                    <p class="card-text text-muted small">@book.Author</p>
+                                    <div class="mt-auto">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="text-primary fw-bold">@book.Price.ToString("C2")</span>
+                                    @if (book.Stock > 0)
+                                    {
+                                                    <span class="badge bg-success small">Stokta</span>
+                                    }
+                                        </div>
+                                        <a href="@Url.Action("Details", new { id = book.Id })" 
+                                           class="btn btn-outline-primary btn-sm w-100">
+                                            <i class="fas fa-eye"></i> Detay
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+            }
+            </div>
+    }
+</div>
+
+@section Scripts {
+        <script>
+            function increaseQuantity() {
+                var input = document.getElementById('quantity');
+                var max = parseInt(input.getAttribute('max'));
+                var current = parseInt(input.value);
+                if (current < max) {
+                    input.value = current + 1;
+                }
+            }
+
+            function decreaseQuantity() {
+                var input = document.getElementById('quantity');
+                var current = parseInt(input.value);
+                if (current > 1) {
+                    input.value = current - 1;
+                }
+            }
+
+            function addToCartWithQuantity() {
+                var quantity = parseInt(document.getElementById('quantity').value);
+                $.ajax({
+                    url: '@Url.Action("AddToCart", "Books")',
+                    type: 'POST',
+                    data: { bookId: @Model.Id, quantity: quantity },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#cart-count').text(response.cartCount);
+                            showAlert('success', response.message);
+                        } else {
+                            showAlert('danger', response.message);
+                        }
+                    },
+                    error: function() {
+                        showAlert('danger', 'Bir hata oluştu. Lütfen tekrar deneyin.');
+                    }
+                });
+            }
+
+            function addToFavorites(bookId) {
+                $.ajax({
+                    url: '@Url.Action("AddToFavorites", "Books")',
+                    type: 'POST',
+                    data: { bookId: bookId },
+                    success: function(response) {
+                        if (response.success) {
+                            showAlert('info', response.message);
+                        } else {
+                            showAlert('warning', response.message);
+                        }
+                    },
+                    error: function() {
+                        showAlert('danger', 'Bir hata oluştu. Lütfen tekrar deneyin.');
+                    }
+                });
+            }
+
+            function shareBook() {
+                if (navigator.share) {
+                    navigator.share({
+                        title: '@Model.Title',
+                        text: '@Model.Author tarafından yazılan @Model.Title kitabını inceleyin!',
+                        url: window.location.href
+                    });
+                } else {
+                    // Fallback for browsers that don't support Web Share API
+                    var url = window.location.href;
+                    navigator.clipboard.writeText(url).then(function() {
+                        showAlert('info', 'Sayfa bağlantısı panoya kopyalandı!');
+                    });
+                }
+            }
+
+            function showAlert(type, message) {
+                var alertHtml = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+                               message +
+                               '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                               '</div>';
+
+                $('main').prepend(alertHtml);
+
+                setTimeout(function() {
+                    $('.alert').alert('close');
+                }, 3000);
+            }
+        </script>
+}
+
+<style>
+    .book-card:hover {
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+    }
+
+    .card {
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+    }
+
+    .badge {
+        font-size: 0.8em;
+    }
+
+    .input-group .btn {
+        min-width: 40px;
+    }
+</style>

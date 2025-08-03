@@ -1,0 +1,157 @@
+﻿@model BookStoreMVC.Models.BookDto
+@{
+    ViewData["Title"] = "Yeni Kitap Ekle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var categories = ViewBag.Categories as List<BookStoreMVC.Models.CategoryDto>;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus"></i> Yeni Kitap Ekle
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" asp-action="CreateBook">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="Title" class="form-label">
+                                    <i class="fas fa-book"></i> Kitap Adı *
+                                </label>
+                                <input type="text" class="form-control" id="Title" name="Title"
+                                       asp-for="Title" placeholder="Örn: 1984" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="Author" class="form-label">
+                                    <i class="fas fa-user"></i> Yazar *
+                                </label>
+                                <input type="text" class="form-control" id="Author" name="Author"
+                                       asp-for="Author" placeholder="Örn: George Orwell" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="CategoryId" class="form-label">
+                                    <i class="fas fa-folder"></i> Kategori *
+                                </label>
+                                <select class="form-select" id="CategoryId" name="CategoryId"
+                                        asp-for="CategoryId" required>
+                                    <option value="">Kategori seçiniz...</option>
+                                    @if (categories != null)
+                                    {
+                                        @foreach (var category in categories)
+                                        {
+                                            <option value="@category.Id">@category.Name</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="Price" class="form-label">
+                                    <i class="fas fa-tag"></i> Fiyat (₺) *
+                                </label>
+                                <input type="number" class="form-control" id="Price" name="Price"
+                                       asp-for="Price" step="0.01" min="0" placeholder="39.90" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="Stock" class="form-label">
+                                    <i class="fas fa-warehouse"></i> Stok Adedi
+                                </label>
+                                <input type="number" class="form-control" id="Stock" name="Stock"
+                                       asp-for="Stock" min="0" placeholder="10" value="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="imageFile" class="form-label">
+                                    <i class="fas fa-image"></i> Kitap Resmi
+                                </label>
+                                <input type="file" class="form-control" id="imageFile" name="imageFile"
+                                       accept="image/*" onchange="previewImage(event)">
+                                <small class="text-muted">JPG, PNG veya GIF formatında olmalıdır.</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Description" class="form-label">
+                                <i class="fas fa-align-left"></i> Açıklama
+                            </label>
+                            <textarea class="form-control" id="Description" name="Description"
+                                      asp-for="Description" rows="4"
+                                      placeholder="Kitap hakkında kısa bir açıklama yazınız..."></textarea>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div class="mb-3" id="imagePreview" style="display: none;">
+                            <label class="form-label">Resim Önizleme:</label>
+                            <div>
+                                <img id="preview" src="" alt="Önizleme" class="img-thumbnail"
+                                     style="max-width: 200px; max-height: 200px;">
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive"
+                                   asp-for="IsActive" checked>
+                            <label class="form-check-label" for="IsActive">
+                                <i class="fas fa-toggle-on text-success"></i> Kitap aktif olsun
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="@Url.Action("Books")" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times"></i> İptal
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Kitap Ekle
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').style.display = 'none';
+            }
+        }
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const title = document.getElementById('Title').value.trim();
+            const author = document.getElementById('Author').value.trim();
+            const price = document.getElementById('Price').value;
+            const categoryId = document.getElementById('CategoryId').value;
+
+            if (!title || !author || !price || !categoryId) {
+                e.preventDefault();
+                alert('Lütfen tüm zorunlu alanları doldurun.');
+                return false;
+            }
+
+            if (parseFloat(price) <= 0) {
+                e.preventDefault();
+                alert('Fiyat 0\'dan büyük olmalıdır.');
+                return false;
+            }
+        });
+    </script>
+}

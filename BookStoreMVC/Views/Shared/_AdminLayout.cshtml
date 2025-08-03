@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin Paneli</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        .admin-sidebar {
+            background: #343a40;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            z-index: 1000;
+        }
+
+        .admin-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .admin-sidebar .nav-link {
+            color: #fff;
+            padding: 15px 20px;
+            border-bottom: 1px solid #495057;
+            display: flex;
+            align-items: center;
+        }
+
+            .admin-sidebar .nav-link:hover,
+            .admin-sidebar .nav-link.active {
+                background: #495057;
+                color: #fff;
+            }
+
+            .admin-sidebar .nav-link i {
+                margin-right: 10px;
+                width: 20px;
+            }
+
+        .admin-header {
+            background: #fff;
+            border-bottom: 1px solid #dee2e6;
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+
+        @@media (max-width: 768px) {
+            .admin-sidebar
+
+        {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .admin-sidebar.show {
+            transform: translateX(0);
+        }
+
+        .admin-content {
+            margin-left: 0;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="admin-sidebar" id="adminSidebar">
+        <div class="p-3 border-bottom">
+            <h4 class="text-white mb-0">
+                <i class="fas fa-book-open"></i> Admin Panel
+            </h4>
+        </div>
+
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link @(ViewData["Title"]?.ToString() == "Admin Paneli" ? "active" : "")"
+                   asp-controller="Admin" asp-action="Index">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(ViewData["Title"]?.ToString().Contains("Kitap") == true ? "active" : "")"
+                   asp-controller="Admin" asp-action="Books">
+                    <i class="fas fa-book"></i> Kitaplar
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(ViewData["Title"]?.ToString().Contains("Kategori") == true ? "active" : "")"
+                   asp-controller="Admin" asp-action="Categories">
+                    <i class="fas fa-folder"></i> Kategoriler
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(ViewData["Title"]?.ToString().Contains("Sipariş") == true ? "active" : "")"
+                   asp-controller="Admin" asp-action="Orders">
+                    <i class="fas fa-shopping-cart"></i> Siparişler
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="alert('Bu özellik henüz geliştirilmemiş.')">
+                    <i class="fas fa-users"></i> Kullanıcılar
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="alert('Bu özellik henüz geliştirilmemiş.')">
+                    <i class="fas fa-heart"></i> Favoriler
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="alert('Bu özellik henüz geliştirilmemiş.')">
+                    <i class="fas fa-chart-bar"></i> Raporlar
+                </a>
+            </li>
+            <li class="nav-item border-top mt-3">
+                <a class="nav-link" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-globe"></i> Siteyi Görüntüle
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Admin" asp-action="Logout">
+                    <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="admin-content">
+        <!-- Header -->
+        <div class="admin-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-secondary d-md-none me-3" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 class="mb-0">@ViewData["Title"]</h2>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="text-muted me-3">
+                    <i class="fas fa-user"></i> @Context.Session.GetString("AdminEmail")
+                </span>
+                <span class="text-muted">
+                    <i class="fas fa-clock"></i> @DateTime.Now.ToString("dd.MM.yyyy HH:mm")
+                </span>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle"></i> @ViewBag.ErrorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- Page Content -->
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('adminSidebar').classList.toggle('show');
+        }
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').alert('close');
+        }, 5000);
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
