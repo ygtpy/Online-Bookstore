@@ -11,10 +11,10 @@ Modern ve kullanıcı dostu bir online kitap mağazası uygulaması. ASP.NET Cor
 ![Kitap Listesi](images/books-catalog.png)
 
 ### 🛒 Sepet
-![Sepet](images/cart-checkout.png)
+![Sepet](images/bag.png)
 
 ### 👨‍💼 Checkout
-![Admin Panel](images/admin-dashboard.png)
+![Admin Panel](images/cart-checkout.png)
 
 ### 📱 Admin Dashboard
 ![Mobile View](images/mobile-responsive.png)
